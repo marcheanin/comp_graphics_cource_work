@@ -35,6 +35,10 @@ def draw_locators(data: dict):
 def draw_field():
     glBegin(GL_LINES)
 
+    zero_cords = (corr, corr)
+    y_cords = (corr, field_width + corr)
+    x_cords = (field_width + corr, corr)
+
     glColor3f(1.0, 0.0, 0.0)
     glVertex2f(0 + corr, 0 + corr)
 
@@ -48,6 +52,39 @@ def draw_field():
     glVertex2f(field_height + corr, 0 + corr)
 
     glEnd()
+
+    i = zero_cords[0]
+    cord = 0
+    cord_step = MAX_CORR / 10
+    fin = x_cords[0]
+    step = abs(zero_cords[0] - x_cords[0]) / 10
+
+    while i < fin + 0.1:
+        text = str(int(cord))
+        glRasterPos2d(i, corr - 0.02)
+        for char in text:
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_10, ord(char))
+
+        i += step
+        cord += cord_step
+
+    i = zero_cords[0]
+    cord = 0
+    cord_step = MAX_CORR / 10
+    fin = x_cords[0]
+    step = abs(zero_cords[0] - x_cords[0]) / 10
+
+    i += step
+    cord += cord_step
+
+    while i < fin + 0.1:
+        text = str(int(cord))
+        glRasterPos2d(corr - 0.07, i)
+        for char in text:
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_10, ord(char))
+
+        i += step
+        cord += cord_step
 
 
 def draw_circle(radius, center):

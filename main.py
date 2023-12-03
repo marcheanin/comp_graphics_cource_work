@@ -1,9 +1,8 @@
+import math
+
 import glfw
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-import time
-from OpenGL.GLU import *
-import math
 
 corr = -0.7
 

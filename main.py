@@ -4,23 +4,32 @@ import glfw
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 
+import points_dealing
+
 corr = -0.7
 
 field_width = 1.5
 field_height = 1.5
 size = 0
 
-MAX_CORR = 100  # max size of field
+MAX_CORR = 75  # max size of field
 
-locators = [('A0', 10, 10, 2500),
-            ('A1', 10, 40, 5000),
-            ('A2', 80, 40, 2500),
-            ('A3', 70, 80, 5000)]
+locators = [['A0', 40, 20, 2500],
+            ['A1', 20, 40, 5000],
+            ['A2', 60, 40, 2500]]
 
-emitters = [(5000, 20, 1, 30, 2),
-            (5000, 40, 1, 50, 2),
-            (5000, 70, 10, 60, 2),
-            (5000, 30, 1, 50, 2)]
+emitter_trace = [(5000, 20, 1, 30, 2),
+                 (5000, 40, 1, 50, 2),
+                 (5000, 70, 10, 60, 2),
+                 (5000, 30, 1, 50, 2)]
+
+emitters = {}
+
+data = [(5000, 10, 10, 10),
+        (5000, math.sqrt(600), math.sqrt(300), math.sqrt(500)),
+        #(2500, 30, 70, 50),
+        (5000, math.sqrt(1000), math.sqrt(400), math.sqrt(700))]
+        #(2500, 30, 30, 30)]
 
 
 def emulate_moving():
@@ -103,6 +112,7 @@ def draw_circle(radius, center):
 
 
 def draw_emitter(data: list):
+    print(data)
     glLineWidth(2.0)
 
     glBegin(GL_LINE_STRIP)
@@ -111,17 +121,17 @@ def draw_emitter(data: list):
 
     for i in range(0, len(data)):
         glColor3f(1.0, 1.0, 0.0)
-        glVertex2f(data[i][1] / MAX_CORR * 1.5 + corr, data[i][3] / MAX_CORR * 1.5 + corr)
+        glVertex2f(data[i][1] / MAX_CORR * 1.5 + corr, data[i][2] / MAX_CORR * 1.5 + corr)
 
         last_pos_x = data[i][1]
-        last_pos_y = data[i][3]
+        last_pos_y = data[i][2]
         last_freq = data[i][0]
 
     glEnd()
 
     for i in range(len(data)):
-        draw_circle(((data[i][2] + data[i][4]) / 2) / MAX_CORR * 1.5,
-                    (data[i][1] / MAX_CORR * 1.5 + corr, data[i][3] / MAX_CORR * 1.5 + corr))
+        draw_circle(data[i][3] / MAX_CORR * 1.5,
+                    (data[i][1] / MAX_CORR * 1.5 + corr, data[i][2] / MAX_CORR * 1.5 + corr))
 
     glColor3f(1.0, 1.0, 0.0)
     text = "(" + str(last_freq) + ")" + " x: " + str(last_pos_x) + " y: " + str(last_pos_y)
@@ -157,9 +167,22 @@ def draw_receiver(name: str, x: int, y: int, max_corr, freq):
     glEnd()
 
 
+def update_data():
+    stop_data = []
+    for elem in data:
+        key = elem[0]
+        val = tuple(elem[1:])
+        if key not in emitters:
+            emitters[key] = list()
+            emitters[key].append(val)
+        elif val not in emitters[key]:
+            emitters[key].append(val)
+
+
 def display(window):
     global field_height
     global field_width
+
     glClear(GL_COLOR_BUFFER_BIT)
     glLoadIdentity()
     glClearColor(0.0, 0.0, 0.0, 0.0)
@@ -171,7 +194,15 @@ def display(window):
     for elem in locators:
         # draw_receiver(70, 70, 100, 5000)
         draw_receiver(elem[0], elem[1], elem[2], MAX_CORR, elem[3])
-    draw_emitter(emitters)
+    update_data()
+    data_for_draw = []
+    for key, val in emitters.items():
+        for elem in val:
+            cords = points_dealing.count_point_from_3_dists(locators[0][1], locators[0][2], elem[0],
+                                                            locators[1][1], locators[1][2], elem[1],
+                                                            locators[2][1], locators[2][2], elem[2])
+            data_for_draw.append([key] + list(cords))
+        draw_emitter(data_for_draw)
     glPopMatrix()
 
     glfw.swap_buffers(window)

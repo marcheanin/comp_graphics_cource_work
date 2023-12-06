@@ -90,8 +90,7 @@ def get_three_nearest_points(points: list):
 def get_trig_center(points):
     x, y = (points[0][0] + points[1][0] + points[2][0]) / 3, (points[0][1] + points[1][1] + points[2][1]) / 3
     error = (count_dist((x, y), points[0]) + count_dist((x, y), points[1]) + count_dist((x, y), points[2])) / 3
-    return (round((points[0][0] + points[1][0] + points[2][0]) / 3, 2),
-            round((points[0][1] + points[1][1] + points[2][1]) / 3, 2)), error
+    return round((points[0][0] + points[1][0] + points[2][0]) / 3, 2), round((points[0][1] + points[1][1] + points[2][1]) / 3, 2), error
 
 
 def count_point_from_3_dists(x1, y1, d1, x2, y2, d2, x3, y3, d3):
@@ -99,8 +98,8 @@ def count_point_from_3_dists(x1, y1, d1, x2, y2, d2, x3, y3, d3):
     intersections2 = get_intersections(x1, y1, d1, x3, y3, d3)
     intersections3 = get_intersections(x2, y2, d2, x3, y3, d3)
 
-    print(intersections1, intersections2, intersections3, sep='\n')
-    print()
+    #print(intersections1, intersections2, intersections3, sep='\n')
+    #print()
 
     if intersections1 == ():
         intersections1 = (find_closest_point2(x1, y1, d1, x2, y2, d2),)
@@ -111,18 +110,18 @@ def count_point_from_3_dists(x1, y1, d1, x2, y2, d2, x3, y3, d3):
     if intersections3 == ():
         intersections3 = (find_closest_point2(x2, y2, d2, x3, y3, d3),)
 
-    print(intersections1, intersections2, intersections3, sep='\n')
+    #print(intersections1, intersections2, intersections3, sep='\n')
 
     points = list(intersections1) + list(intersections2) + list(intersections3)
 
-    print(points, len(points))
+    #print(points, len(points))
     if len(points) < 3:
         res = get_trig_center([(x1, y1), (x2, y2), (x3, y3)])
         return res
 
     near_points = get_three_nearest_points(points)
-    print(near_points)
+    #print(near_points)
     return get_trig_center(near_points)
 
 
-print(count_point_from_3_dists(1, 2, math.sqrt(3), 4, 6, math.sqrt(10), 1, 6, math.sqrt(5)))
+#print(count_point_from_3_dists(1, 2, math.sqrt(1), 4, 6, math.sqrt(1), 1, 6, math.sqrt(1)))

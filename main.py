@@ -27,9 +27,11 @@ emitters = {}
 
 data = [(5000, 10, 10, 10),
         (5000, math.sqrt(600), math.sqrt(300), math.sqrt(500)),
-        #(2500, 30, 70, 50),
+        # (2500, 30, 70, 50),
         (5000, math.sqrt(1000), math.sqrt(400), math.sqrt(700))]
-        #(2500, 30, 30, 30)]
+
+
+# (2500, 30, 30, 30)]
 
 
 def emulate_moving():
@@ -112,7 +114,7 @@ def draw_circle(radius, center):
 
 
 def draw_emitter(data: list):
-    print(data)
+    # print(data)
     glLineWidth(2.0)
 
     glBegin(GL_LINE_STRIP)
@@ -217,12 +219,30 @@ def main():
         glfw.terminate()
         return
     glfw.make_context_current(window)
-    # glfw.set_key_callback(window, key_callback)
+    glfw.set_key_callback(window, key_callback)
     # glfw.set_scroll_callback(window, scroll_callback)
     while not glfw.window_should_close(window):
         display(window)
     glfw.destroy_window(window)
     glfw.terminate()
+
+
+def key_callback(window, key, scancode, action, mods):
+    global MAX_CORR
+    global corr
+    if key == glfw.KEY_UP:
+        MAX_CORR += 10
+    if key == glfw.KEY_DOWN:
+        MAX_CORR -= 10
+    if MAX_CORR == 0:
+        MAX_CORR += 1
+
+    if key == glfw.KEY_RIGHT:
+        corr += 0.1
+    if key == glfw.KEY_LEFT:
+        corr -= 0.1
+    if corr == 0:
+        corr += 0.01
 
 
 if __name__ == '__main__':

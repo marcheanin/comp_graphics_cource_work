@@ -3,6 +3,8 @@ import math
 import glfw
 from OpenGL.GL import *
 from OpenGL.GLUT import *
+from scipy.optimize import root
+import numpy as np
 
 import points_dealing
 
@@ -12,16 +14,17 @@ field_width = 1.5
 field_height = 1.5
 size = 0
 
-MAX_CORR = 75  # max size of field
+MAX_CORR = 100  # max size of field
 
-locators = [['A0', 40, 20, 2500],
-            ['A1', 20, 40, 5000],
-            ['A2', 60, 40, 2500]]
+locators = [['A0', 40, 20],
+            ['A1', 20, 40],
+            ['A2', 60, 40]]
 
 emitter_trace = [(5000, 20, 1, 30, 2),
                  (5000, 40, 1, 50, 2),
                  (5000, 70, 10, 60, 2),
                  (5000, 30, 1, 50, 2)]
+
 
 emitters = {}
 
@@ -30,12 +33,20 @@ data = [(5000, 10, 10, 10),
         # (2500, 30, 70, 50),
         (5000, math.sqrt(1000), math.sqrt(400), math.sqrt(700))]
 
+data_amp = [(5000, 25, 25, 25),
+            (5000, 20, 40, 20),
+            (5000, 17, 18, 20)]
+
 
 # (2500, 30, 30, 30)]
 
 
 def emulate_moving():
     pass
+
+
+def get_distance(power: float):
+    return 10 ** (- (power - 50.0) / 20.0)
 
 
 def draw_locators(data: dict):
@@ -104,7 +115,7 @@ def draw_circle(radius, center):
     twice_pi = 2.0 * 3.1415
 
     for i in range(line_amount):
-        glColor4f(0.0, 0.0, 1.0, 1.0)
+        glColor4f(0.0, 1.0, 1.0, 1.0)
         glVertex2f(
             center[0] + (radius * math.cos(i * twice_pi / line_amount)),
             center[1] + (radius * math.sin(i * twice_pi / line_amount))
@@ -154,10 +165,10 @@ def draw_line(x1, y1, x2, y2, max_corr):
     glEnd()
 
 
-def draw_receiver(name: str, x: int, y: int, max_corr, freq):
+def draw_receiver(name: str, x: int, y: int, max_corr):
     glColor3f(0, 1.0, 0.0)
-    text = "(" + name + ")" + " x: " + str(x) + " y: " + str(y) + " freq: " + str(freq)
-    glRasterPos2d((x - 9) / max_corr * 1.5 + corr, (y + 3) / max_corr * 1.5 + corr)
+    text = "(" + name + ")" + " x: " + str(x) + " y: " + str(y)
+    glRasterPos2d((x - 5) / max_corr * 1.5 + corr, (y + 2) / max_corr * 1.5 + corr)
     for char in text:
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_10, ord(char))
 
@@ -169,7 +180,7 @@ def draw_receiver(name: str, x: int, y: int, max_corr, freq):
     glEnd()
 
 
-def update_data():
+def update_data(data):
     stop_data = []
     for elem in data:
         key = elem[0]
@@ -195,14 +206,14 @@ def display(window):
     # draw_line(10, 10, 70, 70, 100)
     for elem in locators:
         # draw_receiver(70, 70, 100, 5000)
-        draw_receiver(elem[0], elem[1], elem[2], MAX_CORR, elem[3])
-    update_data()
+        draw_receiver(elem[0], elem[1], elem[2], MAX_CORR)
+    update_data(data_amp)
     data_for_draw = []
     for key, val in emitters.items():
         for elem in val:
-            cords = points_dealing.count_point_from_3_dists(locators[0][1], locators[0][2], elem[0],
-                                                            locators[1][1], locators[1][2], elem[1],
-                                                            locators[2][1], locators[2][2], elem[2])
+            cords = points_dealing.count_point_from_3_dists(locators[0][1], locators[0][2], get_distance(elem[0]),
+                                                            locators[1][1], locators[1][2], get_distance(elem[1]),
+                                                            locators[2][1], locators[2][2], get_distance(elem[2]))
             data_for_draw.append([key] + list(cords))
         draw_emitter(data_for_draw)
     glPopMatrix()
@@ -231,18 +242,18 @@ def key_callback(window, key, scancode, action, mods):
     global MAX_CORR
     global corr
     if key == glfw.KEY_UP:
-        MAX_CORR += 10
+        MAX_CORR += 5
     if key == glfw.KEY_DOWN:
-        MAX_CORR -= 10
+        MAX_CORR -= 5
     if MAX_CORR == 0:
         MAX_CORR += 1
 
     if key == glfw.KEY_RIGHT:
-        corr += 0.1
+        corr += 0.05
     if key == glfw.KEY_LEFT:
-        corr -= 0.1
+        corr -= 0.05
     if corr == 0:
-        corr += 0.01
+        corr += 0.001
 
 
 if __name__ == '__main__':

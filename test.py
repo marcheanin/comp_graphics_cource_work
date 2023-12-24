@@ -1,46 +1,24 @@
-from OpenGL.GL import *
-from OpenGL.GLUT import *
-from OpenGL.GLU import *
+import numpy as np
+from scipy import optimize
+import math
 
-def render():
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    # Render your scatter plot here using GLScatterPlotItem
 
-    # Save the model-view matrix
-    glMatrixMode(GL_MODELVIEW)
-    glPushMatrix()
-    glLoadIdentity()
+def get_distance(power: float):
+    def func(x):
+        # return power + 20 * math.log10(x)
+        return power + 20.0 * math.log10(x)
 
-    # Set the projection matrix to an orthographic view
-    glMatrixMode(GL_PROJECTION)
-    glPushMatrix()
-    glLoadIdentity()
-    glOrtho(0, width, 0, height, -1, 1)
+    result = optimize.root(func, np.array([2]))
+    return result.x[0]
 
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
 
-    # Set the position for the text
-    glWindowPos2d(10, 10)  # Adjust the coordinates as per your requirement
-    text = "Your Text Here"
+def f(x):
+    return 10 ** (- (x - 50) / 20)
 
-    # Render the text using OpenGL's built-in bitmap font
-    for char in text:
-        glutBitmapCharacter(GLUT_BITMAP_9_BY_15, ord(char))
+def res(p):
+    return math.sqrt(p / (4 * math.pi * 6))
 
-    glLoadIdentity()
-    glMatrixMode(GL_PROJECTION)
-    glPopMatrix()
-    glMatrixMode(GL_MODELVIEW)
-    glPopMatrix()
 
-    glutSwapBuffers()
+print(f(18))
 
-# Initialize OpenGL and create a window
-glutInit()
-glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
-glutInitWindowSize(800, 600)
-glutCreateWindow(b"Scatter Plot with Text")
-
-glutDisplayFunc(render)
-glutMainLoop()
+print(get_distance(-40))

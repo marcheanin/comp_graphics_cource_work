@@ -15,10 +15,10 @@ field_height = 1.5
 size = 0
 
 MAX_CORR = 100  # max size of field
-
 locators = [['A0', 40, 20],
             ['A1', 20, 40],
             ['A2', 60, 40]]
+
 
 emitter_trace = [(5000, 20, 1, 30, 2),
                  (5000, 40, 1, 50, 2),
@@ -33,9 +33,14 @@ data = [(5000, 10, 10, 10),
         # (2500, 30, 70, 50),
         (5000, math.sqrt(1000), math.sqrt(400), math.sqrt(700))]
 
-data_amp = [(5000, 25, 25, 25),
-            (5000, 20, 40, 20),
-            (5000, 17, 18, 20)]
+data_amp = [(5.8, 25, 25, 17),
+            (5.8, 40, 40, 19.8),
+            (2.4, 25, 17, 25),
+            (5.8, 25, 25, 25),
+            (2.4, 19, 20, 35),
+            (5.8, 17, 18, 20),
+            (2.4, 18, 19, 25)]
+
 
 
 # (2500, 30, 30, 30)]
@@ -181,6 +186,7 @@ def draw_receiver(name: str, x: int, y: int, max_corr):
 
 
 def update_data(data):
+    global emitters
     stop_data = []
     for elem in data:
         key = elem[0]
@@ -216,6 +222,7 @@ def display(window):
                                                             locators[2][1], locators[2][2], get_distance(elem[2]))
             data_for_draw.append([key] + list(cords))
         draw_emitter(data_for_draw)
+        data_for_draw = []
     glPopMatrix()
 
     glfw.swap_buffers(window)

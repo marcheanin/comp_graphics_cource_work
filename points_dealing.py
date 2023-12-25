@@ -22,8 +22,6 @@ def find_closest_point(x1, y1, r1, x2, y2, r2):
 
 
 def find_closest_point2(x1, y1, r1, x2, y2, r2):
-    distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-
     angle = math.atan2(y2 - y1, x2 - x1)
 
     x_res_1 = x1 + r1 * math.cos(angle)
